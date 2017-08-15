@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   laser_geometry
 )
 
+find_package(cmake_modules REQUIRED)  # Required to find eigen
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
@@ -114,14 +115,18 @@ catkin_package(
 # )
 
 ## Declare a cpp executable
-add_executable(OctoSlam src/OctoSlam.cpp src/OctoSlamCalcs.cpp src/Localization.cpp
-        src/roundVoxel.cpp src/transformScan.cpp) 
-       
-target_link_libraries(OctoSlam
+add_executable(octoslam
+  src/OctoSlam.cpp
+  src/OctoSlamCalcs.cpp
+  src/Localization.cpp
+  src/roundVoxel.cpp
+  src/transformScan.cpp)
+
+target_link_libraries(octoslam
    ${catkin_LIBRARIES}
 )
 
-add_executable(scan_to_cloud src/scan_to_cloud.cpp) 
+add_executable(scan_to_cloud src/scan_to_cloud.cpp)
 target_link_libraries(scan_to_cloud
    ${catkin_LIBRARIES}
 )
@@ -132,7 +137,7 @@ target_link_libraries(scan_to_cloud
 # add_dependencies(octoslam_node octoslam_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
- 
+
 #############
 ## Install ##
 #############
@@ -148,7 +153,7 @@ target_link_libraries(scan_to_cloud
 # )
 
 ## Mark executables and/or libraries for installation
- install(TARGETS OctoSlam scan_to_cloud
+ install(TARGETS octoslam scan_to_cloud
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -1,0 +1,24 @@
+<launch>
+    <arg name="max_iterations" default="5"/>
+    <arg name="init_x" default="0.0"/>
+    <arg name="init_y" default="0.0"/>
+    <arg name="init_z" default="0.0"/>
+    <arg name="init_roll" default="0.0"/>
+    <arg name="init_pitch" default="0.0"/>
+    <arg name="init_yaw" default="0.0"/>
+
+    <arg name="scan_topic" default="scan"/>
+    <arg name="pose_topic" default="pose"/>
+
+    <node pkg="octoslam" type="octoslam" name="octoslam">
+        <param name="max_iterations" value="$(arg max_iterations)"/>
+        <param name="init_x" value="$(arg init_x)"/>
+        <param name="init_y" value="$(arg init_y)"/>
+        <param name="init_z" value="$(arg init_z)"/>
+        <param name="init_roll" value="$(arg init_roll)"/>
+        <param name="init_pitch" value="$(arg init_pitch)"/>
+        <param name="init_yaw" value="$(arg init_yaw)"/>
+        <param name="scan_topic" value="$(arg scan_topic)"/>
+        <param name="pose_topic" value="$(arg pose_topic)"/>
+    </node>
+</launch>
