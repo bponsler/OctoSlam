@@ -89,7 +89,6 @@ calculations::calc_mres(octomap::OcTree *map, octomath::Vector3 endpoint)
     octomap::OcTreeKey pointKey, itKey;
     pointKey = map->coordToKey(endpoint);
     if (map->search(endpoint) == NULL) return 0;
-    // if (pointKey == NULL) return 0; // This will be the error case
 
     // Compute the depth of the end point within the tree
     int depth;

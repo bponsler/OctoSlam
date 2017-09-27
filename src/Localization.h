@@ -12,6 +12,7 @@ class Localization
 {
 public:
     Localization(ros::NodeHandle n);
+    ~Localization();
     void data_callback(geometry_msgs::Point pose);
     void scan_callback(const sensor_msgs::LaserScan::ConstPtr &scan);
 
@@ -31,6 +32,9 @@ private:
 
     /** Subscribe to known position data (for roll, pitch, and z) */
     ros::Subscriber aux_sub;
+
+    /** Publish pose data. */
+    ros::Publisher pose_pub;
 
     /** Store the current pose. */
     std::vector<float> current_pose;

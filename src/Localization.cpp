@@ -1,6 +1,10 @@
 #include "Localization.h"
 #include "OctoSlamCalcs.h"
 
+#include <geometry_msgs/Pose.h>
+
+#include <tf/transform_datatypes.h>
+
 
 Localization::Localization(ros::NodeHandle n)
     :
@@ -10,10 +14,14 @@ Localization::Localization(ros::NodeHandle n)
 
     // Grab input parameters
     max_iterations = pn.param("max_iterations", 5);
+    const double resolution = pn.param("resolution", 1.0);
     const std::string scan_topic = pn.param("scan_topic", std::string("scan"));
     const std::string pose_topic = pn.param("pose_topic", std::string("pose"));
+    const std::string pose_out_topic = pn.param(
+        "pose_out_topic", std::string("out_pose"));
 
     // Grab initial pose from parameters
+    current_pose = std::vector<float>(6);
     current_pose.at(X) = pn.param("init_x", 0.0);
     current_pose.at(Y) = pn.param("init_y", 0.0);
     current_pose.at(Z) = pn.param("init_z", 0.0);
@@ -27,9 +35,17 @@ Localization::Localization(ros::NodeHandle n)
     aux_sub = node.subscribe(
         pose_topic, 1000, &Localization::data_callback, this);
 
-    // Will need to initialize the octomap once I know whether I'll
-    // be building the map on the go (actual SLAM) vs. loading a known map
-    // Also goes with how does the Localization, mapping go together?
+    // Publish pose
+    pose_pub = node.advertise<geometry_msgs::Pose>(
+        pose_out_topic, 10);
+
+    // Initialize the map
+    map = new octomap::OcTree(resolution); // TODO: need a map....
+}
+
+Localization::~Localization()
+{
+    delete map;
 }
 
 void
@@ -100,6 +116,7 @@ Localization::scan_callback(const sensor_msgs::LaserScan::ConstPtr &scan)
             // Note: this for loop performs the sums for hessian and
             // det for each laser scan point
             Hessian = Hessian + calculations::calc_hessian(dMdx, dMdy, gammaP);
+
             det = det + calculations::calc_det(mv, dMdx, dMdy, gammaP);
         }
 
@@ -112,5 +129,14 @@ Localization::scan_callback(const sensor_msgs::LaserScan::ConstPtr &scan)
     current_pose.at(Y) = T(1);
     current_pose.at(GAMMA) = T(2);
 
-    // TODO: publish new pose
+    // Publish the updated pose
+    geometry_msgs::Pose pose;
+    pose.position.x = current_pose.at(X);
+    pose.position.y = current_pose.at(Y);
+    pose.position.z = current_pose.at(Z);
+    pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(
+        current_pose.at(PHI),
+        current_pose.at(PSI),
+        current_pose.at(GAMMA));
+    pose_pub.publish(pose);
 }
